@@ -3,11 +3,13 @@ import agendaalan.br.agenda.Model.Contato
 import agendaalan.br.agenda.R
 import agendaalan.br.agenda.Repository.ContatoRepository
 import agendaalan.br.agenda.util.Constants.dateFormatter
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.DatePickerDialog
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
@@ -31,6 +33,7 @@ class CadastroActivity : AppCompatActivity() {
     val REQUEST_IMAGE_CAPTURE = 1
     var mCurrentPhotoPath: String? = null
 
+    @SuppressLint("ResourceType")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_cadastro)
@@ -75,6 +78,7 @@ class CadastroActivity : AppCompatActivity() {
             dispatchTakePictureIntentSimple();
         }
 
+
         btnCadastro?.setOnClickListener {
 
             contato?.foto = mCurrentPhotoPath
@@ -118,7 +122,7 @@ class CadastroActivity : AppCompatActivity() {
 
                 if(contato?.foto != null){
                     readBitmapFile(contato?.foto!!);
-                    localArquivoFoto = contato?.foto
+                    mCurrentPhotoPath = contato?.foto
                 }
 
 
@@ -134,6 +138,7 @@ class CadastroActivity : AppCompatActivity() {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
             val extras = data!!.extras
             val imageBitmap = extras!!.get("data") as Bitmap
+
             imgContato.setImageBitmap(imageBitmap)
 
             try {
@@ -161,6 +166,7 @@ class CadastroActivity : AppCompatActivity() {
         )
         // Save a file: path for use with ACTION_VIEW intents
         mCurrentPhotoPath = image.getAbsolutePath()
+        contato?.foto = mCurrentPhotoPath
         return image
     }
 
