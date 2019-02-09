@@ -73,6 +73,19 @@ class ContatoRepository(val context: Context) {
         delete(CONTATOS_TABLE_NAME, whereClause = "id = {contatoId}", args = "contatoId" to id)
     }
 
+    //receiver
+
+    fun isContato(telefone: String) : Boolean = context.database.use {
+        select(CONTATOS_TABLE_NAME, "count(*) as total")
+                .whereArgs("telefone = {telefone}","telefone" to telefone)
+                .parseSingle(object: MapRowParser<Boolean> {
+                    override fun parseRow(columns: Map<String, Any?>): Boolean {
+                        val total = columns.getValue("total")
+                        return total.toString().toInt() > 0;
+                    }
+                })
+    }
+
     //filtros
 
     fun findAll(filter: String) : ArrayList<Contato> = context.database.use {

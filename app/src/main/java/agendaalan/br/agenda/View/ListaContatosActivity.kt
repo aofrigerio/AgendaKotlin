@@ -4,14 +4,22 @@ import agendaalan.br.agenda.Model.Contato
 import agendaalan.br.agenda.R
 import agendaalan.br.agenda.R.id.whatsapp
 import agendaalan.br.agenda.Repository.ContatoRepository
+import agendaalan.br.agenda.util.SMSReceiver
+import android.content.BroadcastReceiver
 import android.content.DialogInterface
 import android.content.Intent
+import android.content.IntentFilter
+import android.content.pm.PackageManager
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.renderscript.Sampler
+import android.support.v4.app.ActivityCompat
+import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
+import android.telephony.SmsMessage
+import android.util.Log
 import android.view.ContextMenu
 
 import kotlinx.android.synthetic.main.activity_lista_contatos.*
@@ -21,11 +29,17 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
 import android.widget.Toast
+import java.util.jar.Manifest
+import java.util.logging.Logger
 
 class ListaContatosActivity : AppCompatActivity() {
 
     private var contatoSelecionado:Contato? = null
     private var contatos = ArrayList<Contato>()
+
+    val MY_PERMISSIONS_REQUEST_SMS_RECEIVE = 10
+    var receiver: BroadcastReceiver? = null
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,6 +52,14 @@ class ListaContatosActivity : AppCompatActivity() {
 
 
         //val contatos = arrayOf("Maria", "José", "Carlos")
+        //permissão do listem
+
+        //permissão do listem
+        setupPermissions()
+        configureReceiver()
+
+        
+        /////
 
         //Listar
         contatos = ContatoRepository(this).findAll()
@@ -190,6 +212,41 @@ class ListaContatosActivity : AppCompatActivity() {
         lista?.adapter = adapter
         adapter.notifyDataSetChanged()
     }
+
+    private fun setupPermissions() {
+
+        val list = listOf<String>(
+                android.Manifest.permission.RECEIVE_SMS
+        )
+
+        //val MY_PERMISSIONS_REQUEST_SMS_RECEIVE
+        ActivityCompat.requestPermissions(this,
+                list.toTypedArray(), MY_PERMISSIONS_REQUEST_SMS_RECEIVE);
+
+        val permission = ContextCompat.checkSelfPermission(this,
+                android.Manifest.permission.READ_SMS)
+
+        if (permission != PackageManager.GET_SERVICES) {
+            Log.i("aula", "Permission to record denied")
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == MY_PERMISSIONS_REQUEST_SMS_RECEIVE) {
+            Logger.getLogger(SmsMessage::class.java.name).warning("Permission RECEIVE SMS")
+        }
+    }
+
+    private fun configureReceiver() {
+        val filter = IntentFilter()
+        filter.addAction("br.aula.agenda.broadcast.SMSreceiver")
+        filter.addAction("android.provider.Telephony.SMS_RECEIVED")
+        receiver = SMSReceiver()
+        registerReceiver(receiver, filter)
+    }
+
+
 
 
 
