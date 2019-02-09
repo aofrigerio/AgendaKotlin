@@ -2,6 +2,7 @@ package agendaalan.br.agenda.View
 import agendaalan.br.agenda.Model.Contato
 import agendaalan.br.agenda.R
 import agendaalan.br.agenda.Repository.ContatoRepository
+import agendaalan.br.agenda.util.Constants.dateFormatter
 import android.app.Activity
 import android.app.DatePickerDialog
 import android.content.Intent
@@ -28,7 +29,7 @@ class CadastroActivity : AppCompatActivity() {
     var contato : Contato? = null
     private val localArquivoFoto: String? = null
     val REQUEST_IMAGE_CAPTURE = 1
-    var mCurrentPhotoPath
+    var mCurrentPhotoPath: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -107,13 +108,18 @@ class CadastroActivity : AppCompatActivity() {
                 txtEndereco?.setText(contato?.endereco)
                 txtTelefone.setText(contato?.telefone.toString())
 
-                /*
+
                 if (contato?.dataNascimento != null) {
                     datanascimento?.setText(dateFormatter?.format(Date(contato?.dataNascimento!!)))
                 } else {
                     datanascimento?.setText(dateFormatter?.format(Date()))
                 }
-                */
+
+
+                if(contato?.foto != null){
+                    readBitmapFile(contato?.foto!!);
+                }
+
 
                 txtEmail.setText(contato?.email)
                 txtSite?.setText(contato?.site)
@@ -125,10 +131,19 @@ class CadastroActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
-            val extras = data?.extras
+            val extras = data!!.extras
             val imageBitmap = extras!!.get("data") as Bitmap
             imgContato.setImageBitmap(imageBitmap)
-        }
+
+            try {
+                this.storeImage(imageBitmap)
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+
+     }
+
+
 
     }
 
@@ -179,6 +194,7 @@ class CadastroActivity : AppCompatActivity() {
         } catch (e: FileNotFoundException) {
             e.printStackTrace()
         }
+
         imgContato.setImageBitmap(bitmap)
     }
 
