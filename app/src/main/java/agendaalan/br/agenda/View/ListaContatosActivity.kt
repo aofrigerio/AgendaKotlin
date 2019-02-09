@@ -40,7 +40,7 @@ class ListaContatosActivity : AppCompatActivity() {
         //val contatos = arrayOf("Maria", "José", "Carlos")
 
         //Listar
-        var contatos = ContatoRepository(this).findAll()
+        contatos = ContatoRepository(this).findAll()
         val adapter  = ArrayAdapter(this, android.R.layout.simple_list_item_1,contatos)
         var listaContatos = lista
         listaContatos.setAdapter(adapter);

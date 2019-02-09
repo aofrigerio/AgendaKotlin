@@ -27,7 +27,7 @@ class CadastroActivity : AppCompatActivity() {
     var cal = Calendar.getInstance()
     var datanascimento : Button? = null
     var contato : Contato? = null
-    private val localArquivoFoto: String? = null
+    private var localArquivoFoto: String? = null
     val REQUEST_IMAGE_CAPTURE = 1
     var mCurrentPhotoPath: String? = null
 
@@ -118,6 +118,7 @@ class CadastroActivity : AppCompatActivity() {
 
                 if(contato?.foto != null){
                     readBitmapFile(contato?.foto!!);
+                    localArquivoFoto = contato?.foto
                 }
 
 
